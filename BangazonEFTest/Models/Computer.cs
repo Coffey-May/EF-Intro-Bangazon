@@ -21,5 +21,7 @@ namespace BangazonEFTest.Models
         public DateTime PurchaseDate { get; set; }
 
         public DateTime? DecomissionDate { get; set; }
+
+        public Employee Employee { get; set; }
     }
 }
