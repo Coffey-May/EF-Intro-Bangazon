@@ -28,17 +28,10 @@ namespace BangazonEFTest.Controllers
         // GET: Departments/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var department = await _context.Department
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (department == null)
-            {
-                return NotFound();
-            }
+                .Include(d => d.Employees)
+                    .ThenInclude(e => e.Computer)
+                .ToListAsync();
 
             return View(department);
         }

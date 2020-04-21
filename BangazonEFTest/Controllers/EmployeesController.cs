@@ -11,12 +11,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BangazonEFTest.Controllers
 {
-    public class EmployeeController : Controller
+    public class EmployeesController : Controller
     {
         // Our controllers have a reference to our database via the _context field
         private readonly ApplicationDbContext _context;
 
-        public EmployeeController(ApplicationDbContext context)
+        public EmployeesController(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -47,6 +47,7 @@ namespace BangazonEFTest.Controllers
             // EXAMPLE: We don't want a list of Computer and Department Objects here. We want a list of
             // SelectListItems.
             var allComputers = await _context.Computer
+                .Where(c => c.DecomissionDate == null && c.Employee == null)
                 .Select(d => new SelectListItem() { Text = d.Model, Value = d.Id.ToString() })
                 .ToListAsync();
             var allDepartments = await _context.Department
@@ -144,19 +145,22 @@ namespace BangazonEFTest.Controllers
         }
 
         // GET: Employee/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            return View();
+            var employee = await _context.Employee.FirstOrDefaultAsync(e => e.Id == id);
+
+            return View(employee);
         }
 
         // POST: Employee/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> Delete(int id, Employee employee)
         {
             try
             {
-                // TODO: Add delete logic here
+                _context.Employee.Remove(employee);
+                await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(Index));
             }
